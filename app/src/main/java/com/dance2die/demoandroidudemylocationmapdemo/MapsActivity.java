@@ -1,7 +1,9 @@
 package com.dance2die.demoandroidudemylocationmapdemo;
 
 import android.content.Context;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,7 +18,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
@@ -42,10 +46,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         provider = locationManager.getBestProvider(new Criteria(), false);
         Log.i("provider", provider);
 
-        Location location = locationManager.getLastKnownLocation(provider);
-        if (location != null){
-            onLocationChanged(location);
-        }
+//        Location location = locationManager.getLastKnownLocation(provider);
+//        if (location != null){
+//            onLocationChanged(location);
+//        }
 
     }
 
@@ -93,6 +97,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.clear();
         mMap.addMarker(new MarkerOptions().position(latLng).title("You location!!!"));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 5));
+
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+            if (addresses != null && addresses.size() > 0){
+                Log.i("PlaceInfo", addresses.get(0).toString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
