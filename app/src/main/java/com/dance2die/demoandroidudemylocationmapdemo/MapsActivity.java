@@ -42,6 +42,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         provider = locationManager.getBestProvider(new Criteria(), false);
         Log.i("provider", provider);
 
+        Location location = locationManager.getLastKnownLocation(provider);
+        if (location != null){
+            onLocationChanged(location);
+        }
+
     }
 
 
@@ -58,15 +63,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+//        // Add a marker in Sydney and move the camera
+//        LatLng sydney = new LatLng(-34, 151);
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        locationManager.requestLocationUpdates(provider, 400, 1, this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        locationManager.removeUpdates(this);
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        Double lat = location.getLatitude();
+        Double lng = location.getLongitude();
 
+        Log.i("Location Info: Lat", lat.toString());
+        Log.i("Location Info: Lng", lng.toString());
+
+        LatLng latLng = new LatLng(lat, lng);
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions().position(latLng).title("You location!!!"));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 5));
     }
 
     @Override
